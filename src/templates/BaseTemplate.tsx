@@ -1,59 +1,47 @@
-import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { type ReactNode } from 'react';
 
 import { AppConfig } from '@/utils/AppConfig';
 
-const BaseTemplate = (props: {
-  leftNav: ReactNode;
-  rightNav?: ReactNode;
-  children: ReactNode;
-}) => {
-  const t = useTranslations('BaseTemplate');
-
+const BaseTemplate = (props: { children: ReactNode }) => {
   return (
-    <div className="w-full px-1 text-gray-700 antialiased">
-      <div className="mx-auto max-w-screen-md">
-        <header className="border-b border-gray-300">
-          <div className="pb-8 pt-16">
-            <h1 className="text-3xl font-bold text-gray-900">
-              {AppConfig.name}
-            </h1>
-            <h2 className="text-xl">{t('description')}</h2>
-          </div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 antialiased">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-6 sm:px-8">
+        <header className="mb-10 rounded-[2rem] border border-white/10 bg-white/5 px-6 py-5 backdrop-blur">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <Link href="/" className="text-xl font-semibold tracking-tight">
+                {AppConfig.name}
+              </Link>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                {AppConfig.description}
+              </p>
+            </div>
 
-          <div className="flex justify-between">
-            <nav>
-              <ul className="flex flex-wrap gap-x-5 text-xl">
-                {props.leftNav}
-              </ul>
-            </nav>
-
-            <nav>
-              <ul className="flex flex-wrap gap-x-5 text-xl">
-                {props.rightNav}
+            <nav aria-label="Navegacao principal">
+              <ul className="flex flex-wrap items-center gap-3 text-sm font-medium">
+                {AppConfig.navigation.map(item => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="inline-flex rounded-full border border-white/10 px-4 py-2 text-slate-200 transition hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </nav>
           </div>
         </header>
 
-        <main>{props.children}</main>
+        <main className="flex-1">{props.children}</main>
 
-        <footer className="border-t border-gray-300 py-8 text-center text-sm">
-          © Copyright {new Date().getFullYear()} {AppConfig.name}.
-          {` ${t('made_with')} `}
-          <a
-            href="https://creativedesignsguru.com"
-            className="text-blue-700 hover:border-b-2 hover:border-blue-700"
-          >
-            CreativeDesignsGuru
-          </a>
-          .
-          {/*
-           * PLEASE READ THIS SECTION
-           * I'm an indie maker with limited resources and funds, I'll really appreciate if you could have a link to my website.
-           * The link doesn't need to appear on every pages, one link on one page is enough.
-           * For example, in the `About` page. Thank you for your support, it'll mean a lot to me.
-           */}
+        <footer className="mt-10 border-t border-white/10 py-6 text-sm text-slate-400">
+          <p>
+            {new Date().getFullYear()} {AppConfig.name}. Base frontend focada em
+            clareza, manutencao e evolucao rapida.
+          </p>
         </footer>
       </div>
     </div>
