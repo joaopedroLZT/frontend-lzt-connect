@@ -2,6 +2,7 @@ import '@/styles/global.css';
 
 import type { Metadata } from 'next';
 
+import { AuthProvider } from '@/components/AuthProvider';
 import { AppConfig } from '@/utils/AppConfig';
 
 export const metadata: Metadata = {
@@ -12,7 +13,9 @@ export const metadata: Metadata = {
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>{props.children}</body>
+      <body>
+        <AuthProvider>{props.children}</AuthProvider>
+      </body>
     </html>
   );
 }

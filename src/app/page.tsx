@@ -1,99 +1,66 @@
-import { FeatureCard } from '@/components/FeatureCard';
-import { SectionTitle } from '@/components/SectionTitle';
+import Image from 'next/image';
+
+import { AuthGuard } from '@/components/AuthGuard';
 import { BaseTemplate } from '@/templates/BaseTemplate';
-
-const highlights = [
-  {
-    title: 'Estrutura clara',
-    description:
-      'Uma base pequena, organizada e facil de navegar para acelerar alteracoes sem carregar regras desnecessarias.',
-  },
-  {
-    title: 'Componentizacao simples',
-    description:
-      'Componentes reaproveitaveis e estilos consistentes para manter padrao visual e evolucao segura.',
-  },
-  {
-    title: 'Responsividade desde o inicio',
-    description:
-      'Layout preparado para desktop e mobile com foco em legibilidade, ritmo e manutencao.',
-  },
-];
-
-const workflow = [
-  'Criar novas secoes e componentes com Tailwind de forma padronizada.',
-  'Consumir dados do seu backend sem acoplar regras de banco ao frontend.',
-  'Adaptar o visual por pagina sem lutar contra um boilerplate excessivo.',
-];
 
 export default function Home() {
   return (
-    <BaseTemplate>
-      <section className="grid gap-8 rounded-[2rem] border border-white/10 bg-gradient-to-br from-cyan-400/10 via-white/5 to-transparent px-6 py-10 sm:px-8 lg:grid-cols-[1.3fr_0.9fr]">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-cyan-300">
-            Frontend puro
-          </p>
-          <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            Uma base mais leve para construir a interface do seu projeto com
-            velocidade e consistencia.
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
-            O projeto agora esta focado no que interessa para esta etapa:
-            interface responsiva, organizacao de componentes e liberdade para
-            integrar com o backend que voce ja possui.
-          </p>
-        </div>
-
-        <div className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
-            O que ficou
-          </p>
-          <ul className="mt-5 space-y-4 text-sm leading-6 text-slate-300">
-            <li>Next.js com App Router</li>
-            <li>TypeScript</li>
-            <li>Tailwind CSS</li>
-            <li>Estrutura preparada para crescer sem bagunca</li>
-          </ul>
-        </div>
-      </section>
-
-      <section className="mt-16">
-        <SectionTitle
-          eyebrow="Base visual"
-          title="O boilerplate foi reduzido ao essencial."
-          description="Removemos banco, migrations, autenticacao, testes, monitoramento e referencias ao repositorio original para voce comecar com uma fundacao mais limpa."
-        />
-
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {highlights.map(item => (
-            <FeatureCard
-              key={item.title}
-              title={item.title}
-              description={item.description}
+    <AuthGuard>
+      <BaseTemplate currentPath="/">
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.85fr)_minmax(18rem,22rem)] xl:items-stretch">
+          <article className="relative overflow-hidden rounded-[1.75rem] bg-[#131c29] px-6 py-5 text-white shadow-[0_1.5rem_4rem_rgba(15,23,42,0.18)] sm:px-8 sm:py-6 lg:px-10 xl:min-h-[12rem]">
+            <Image
+              src="/assets/background/background-5.webp"
+              alt=""
+              fill
+              className="object-cover opacity-30"
+              priority
             />
-          ))}
-        </div>
-      </section>
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,18,31,0.97)_0%,rgba(12,18,31,0.9)_36%,rgba(12,18,31,0.62)_100%)]" />
 
-      <section className="mt-16 rounded-[2rem] border border-white/10 bg-white/5 px-6 py-8 sm:px-8">
-        <SectionTitle
-          eyebrow="Proximo passo"
-          title="Pronto para receber seu design e as chamadas ao backend."
-          description="A partir daqui, a evolucao natural e criar os componentes reais do seu produto e conectar as telas as APIs que ja existem."
-        />
+            <div className="relative z-10 grid min-h-[12rem] gap-4 lg:grid-cols-[minmax(0,1fr)_13rem] lg:items-center xl:min-h-[12rem]">
+              <div className="max-w-md">
+                <p className="text-sm font-medium text-slate-300">
+                  Painel inicial
+                </p>
+                <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl lg:text-[1.85rem]">
+                  Seja bem-vindo
+                  <br />
+                  ao LZT Connect
+                </h1>
+                <p className="mt-2 max-w-xs text-sm leading-6 text-slate-300 sm:max-w-sm sm:text-[0.9375rem]">
+                  Mantenha-se atualizado(a) sobre suas vendas, acompanhe metas e
+                  visualize rapidamente o que precisa de atencao.
+                </p>
+              </div>
 
-        <ul className="mt-8 grid gap-4 text-sm leading-6 text-slate-300 md:grid-cols-3">
-          {workflow.map(item => (
-            <li
-              key={item}
-              className="rounded-2xl border border-white/10 bg-slate-950/60 p-5"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
-      </section>
-    </BaseTemplate>
+              <div className="relative flex min-h-[7rem] items-end justify-center lg:justify-end">
+                <div className="absolute bottom-2 left-1/2 h-14 w-14 -translate-x-1/2 rounded-full bg-[#2d6eff]/25 blur-3xl lg:left-auto lg:right-7 lg:translate-x-0" />
+                <Image
+                  src="/assets/illustrations/character-3.webp"
+                  alt="Personagem de apoio visual"
+                  width={240}
+                  height={240}
+                  className="relative z-10 h-auto w-24 sm:w-28 lg:w-32"
+                  priority
+                />
+              </div>
+            </div>
+          </article>
+
+          <aside className="overflow-hidden rounded-[1.75rem] bg-white shadow-[0_1.5rem_4rem_rgba(15,23,42,0.08)] xl:min-h-[12rem]">
+            <div className="relative min-h-[12rem] h-full w-full xl:min-h-[12rem]">
+              <Image
+                src="/assets/images/imagem1.png"
+                alt="Oferta da semana do usuario"
+                fill
+                className="object-contain object-center"
+                priority
+              />
+            </div>
+          </aside>
+        </section>
+      </BaseTemplate>
+    </AuthGuard>
   );
 }

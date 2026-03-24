@@ -1,15 +1,37 @@
+import type { UserRole } from '@/types/auth';
+
 export const AppConfig = {
-  name: 'frontend-lzt-connect',
-  description:
-    'Base frontend simples, responsiva e componentizada para evoluir com facilidade.',
-  navigation: [
+  name: 'LZT Connect',
+  description: 'Painel inicial com acesso rapido aos modulos principais.',
+  sidebarGroups: [
     {
-      href: '/',
-      label: 'Inicio',
+      title: 'Visao geral',
+      items: [
+        {
+          label: 'Dashboard',
+          href: '/',
+        },
+      ],
     },
     {
-      href: '/about',
-      label: 'Sobre',
+      title: 'Gerenciamento',
+      items: [
+        {
+          label: 'Usuarios',
+          href: '/usuarios',
+          roles: ['ADMIN'] as UserRole[],
+        },
+        {
+          label: 'Clientes',
+          href: '/clientes',
+          roles: ['ADMIN', 'USER'] as UserRole[],
+        },
+        {
+          label: 'Vendas',
+          href: '#',
+          roles: ['ADMIN', 'USER'] as UserRole[],
+        },
+      ],
     },
   ],
 };
