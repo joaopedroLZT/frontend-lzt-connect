@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { apiFetch } from '@/utils/api';
 import { Button } from '@/components/Button';
@@ -60,6 +60,21 @@ const CustomersTableSection = (props: CustomersTableSectionProps) => {
   const [roleDrafts, setRoleDrafts] = useState<Record<string, string>>({});
   const [savingRoleId, setSavingRoleId] = useState('');
   const [roleMessage, setRoleMessage] = useState('');
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    firstname: '',
+    lastname: '',
+    birthday: '',
+    phone: '',
+    street: '',
+    city: '',
+    state: '',
+    zip_code: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
   const [roleChangeTarget, setRoleChangeTarget] = useState<{
     nextRole: string;
     previousRole: string;
@@ -242,106 +257,186 @@ const CustomersTableSection = (props: CustomersTableSectionProps) => {
     }
   };
 
-  const columns: Column<ApiUser>[] = [
-    {
-      key: 'name',
-      header: 'Nome',
-      className: 'min-w-[16rem]',
-      render: row => (
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f0ff] text-sm font-semibold text-[#2463eb]">
-            {row.firstname.charAt(0)}
+  const columns = useMemo<Column<ApiUser>[]>(() => {
+    const baseColumns: Column<ApiUser>[] = [
+      {
+        key: 'name',
+        header: 'Nome',
+        className: 'min-w-[16rem]',
+        render: (row: ApiUser) => (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f0ff] text-sm font-semibold text-[#2463eb]">
+              {row.firstname.charAt(0)}
+            </div>
+            <div>
+              <p className="font-medium text-slate-800">
+                {row.firstname} {row.lastname}
+              </p>
+              <p className="text-sm text-slate-400">{row.id}</p>
+            </div>
           </div>
-          <div>
-            <p className="font-medium text-slate-800">
-              {row.firstname} {row.lastname}
-            </p>
-            <p className="text-sm text-slate-400">{row.id}</p>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'email',
-      header: 'E-mail',
-      className: 'min-w-[14rem]',
-      render: row => row.email,
-    },
-    {
-      key: 'phone',
-      header: 'Telefone',
-      className: 'min-w-[11rem]',
-      render: row => row.phone,
-    },
-    {
-      key: 'location',
-      header: 'Localidade',
-      className: 'min-w-[12rem]',
-      render: row => `${row.city} - ${row.state}`,
-    },
-    {
-      key: 'role',
-      header: 'Perfil',
-      className: 'min-w-[12rem]',
-      render: row => {
-        const selectedRole = roleDrafts[row.id] ?? row.role;
-        const roleClassName =
-          selectedRole === 'ADMIN'
-            ? 'bg-[#ffe0db] text-[#e1503f]'
-            : selectedRole === 'USER'
-              ? 'bg-[#dff5ff] text-[#0f97ca]'
-              : 'bg-[#e8f0ff] text-[#2463eb]';
-
-        return (
-        <div className="relative inline-flex">
-          <select
-            value={selectedRole}
-            onChange={event => {
-              const nextRole = event.target.value;
-
-              setRoleDrafts(current => ({
-                ...current,
-                [row.id]: nextRole,
-              }));
-
-              if (nextRole !== row.role) {
-                setRoleChangeTarget({
-                  nextRole,
-                  previousRole: row.role,
-                  userId: row.id,
-                  userName: `${row.firstname} ${row.lastname}`.trim(),
-                });
-              }
-            }}
-            className={`min-w-[9rem] appearance-none rounded-xl border-0 px-3 py-2 pr-9 text-sm font-semibold outline-none transition ${roleClassName}`}
-          >
-            {availableRoles.map(role => (
-              <option key={`${row.id}-${role}`} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-
-          <svg
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-          >
-            <path
-              d="M3 4.5L6 7.5L9 4.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-        );
+        ),
       },
-    },
-  ].filter(column => visibleColumns.includes(column.key));
+      {
+        key: 'email',
+        header: 'E-mail',
+        className: 'min-w-[14rem]',
+        render: (row: ApiUser) => row.email,
+      },
+      {
+        key: 'phone',
+        header: 'Telefone',
+        className: 'min-w-[11rem]',
+        render: (row: ApiUser) => row.phone,
+      },
+      {
+        key: 'location',
+        header: 'Localidade',
+        className: 'min-w-[12rem]',
+        render: (row: ApiUser) => `${row.city} - ${row.state}`,
+      },
+      {
+        key: 'role',
+        header: 'Perfil',
+        className: 'min-w-[12rem]',
+        render: (row: ApiUser) => {
+          const selectedRole = roleDrafts[row.id] ?? row.role;
+          const roleClassName =
+            selectedRole === 'ADMIN'
+              ? 'bg-[#ffe0db] text-[#e1503f]'
+              : selectedRole === 'USER'
+                ? 'bg-[#dff5ff] text-[#0f97ca]'
+                : 'bg-[#e8f0ff] text-[#2463eb]';
+
+          return (
+            <div className="relative inline-flex">
+              <select
+                value={selectedRole}
+                disabled={savingRoleId === row.id}
+                onChange={event => {
+                  const nextRole = event.target.value;
+
+                  setRoleDrafts(current => ({
+                    ...current,
+                    [row.id]: nextRole,
+                  }));
+
+                  if (nextRole !== row.role) {
+                    setRoleChangeTarget({
+                      nextRole,
+                      previousRole: row.role,
+                      userId: row.id,
+                      userName: `${row.firstname} ${row.lastname}`.trim(),
+                    });
+                  }
+                }}
+                className={`min-w-[9rem] appearance-none rounded-xl border-0 px-3 py-2 pr-9 text-sm font-semibold outline-none transition disabled:opacity-50 ${roleClassName}`}
+              >
+                {availableRoles.map(role => (
+                  <option key={`${row.id}-${role}`} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+
+              <svg
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+              >
+                <path
+                  d="M3 4.5L6 7.5L9 4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          );
+        },
+      },
+    ];
+
+    return baseColumns.filter(column => visibleColumns.includes(column.key));
+  }, [roleDrafts, visibleColumns, availableRoles, savingRoleId]);
+
+  const formatBirthday = (value: string) => {
+    if (!value) {
+      return '';
+    }
+
+    const [year, month, day] = value.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  const handleCreateUser = async () => {
+    if (createForm.password.length < 7) {
+      setErrorMessage('A senha deve ter no minimo 7 caracteres.');
+      return;
+    }
+
+    if (createForm.password !== createForm.confirmPassword) {
+      setErrorMessage('A confirmacao de senha nao confere.');
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      setErrorMessage('');
+      setRoleMessage('');
+
+      const response = await apiFetch('/users', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: createForm.email,
+          password: createForm.password,
+          firstname: createForm.firstname,
+          lastname: createForm.lastname,
+          birthday: formatBirthday(createForm.birthday),
+          phone: createForm.phone,
+          street: createForm.street,
+          city: createForm.city,
+          state: createForm.state,
+          zip_code: createForm.zip_code,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = (await response.json().catch(() => null)) as { message?: string | string[] } | null;
+        const message = Array.isArray(error?.message) ? error.message.join(', ') : error?.message;
+        throw new Error(message ?? 'Nao foi possivel criar o usuario.');
+      }
+
+      const createdUser = (await response.json()) as ApiUser;
+      setUsers(current => [createdUser, ...current]);
+      setRoleDrafts(current => ({
+        ...current,
+        [createdUser.id]: createdUser.role,
+      }));
+      setCreateForm({
+        firstname: '',
+        lastname: '',
+        birthday: '',
+        phone: '',
+        street: '',
+        city: '',
+        state: '',
+        zip_code: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      });
+      setIsCreateOpen(false);
+      setRoleMessage(`Usuario ${createdUser.firstname} criado com sucesso.`);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Nao foi possivel criar o usuario.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   return (
     <section className="space-y-6">
@@ -374,6 +469,7 @@ const CustomersTableSection = (props: CustomersTableSectionProps) => {
         </div>
 
         <Button
+          onClick={() => setIsCreateOpen(current => !current)}
           icon={
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
@@ -388,6 +484,38 @@ const CustomersTableSection = (props: CustomersTableSectionProps) => {
           {props.actionLabel}
         </Button>
       </div>
+
+      {isCreateOpen ? (
+        <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_1.25rem_3rem_rgba(15,23,42,0.05)]">
+          <div className="mb-5">
+            <h2 className="text-lg font-semibold text-slate-900">Novo usuario</h2>
+            <p className="mt-1 text-sm text-slate-500">Criacao disponivel apenas para administradores.</p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <input value={createForm.firstname} onChange={event => setCreateForm(current => ({ ...current, firstname: event.target.value }))} placeholder="Nome" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input value={createForm.lastname} onChange={event => setCreateForm(current => ({ ...current, lastname: event.target.value }))} placeholder="Sobrenome" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input type="date" value={createForm.birthday} onChange={event => setCreateForm(current => ({ ...current, birthday: event.target.value }))} className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input value={createForm.phone} onChange={event => setCreateForm(current => ({ ...current, phone: event.target.value }))} placeholder="Telefone" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input value={createForm.city} onChange={event => setCreateForm(current => ({ ...current, city: event.target.value }))} placeholder="Cidade" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input value={createForm.state} onChange={event => setCreateForm(current => ({ ...current, state: event.target.value.toUpperCase() }))} placeholder="UF" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input value={createForm.street} onChange={event => setCreateForm(current => ({ ...current, street: event.target.value }))} placeholder="Rua" className="rounded-xl border border-slate-200 px-4 py-3 text-sm xl:col-span-2" />
+            <input value={createForm.zip_code} onChange={event => setCreateForm(current => ({ ...current, zip_code: event.target.value }))} placeholder="CEP" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input type="email" value={createForm.email} onChange={event => setCreateForm(current => ({ ...current, email: event.target.value }))} placeholder="E-mail" className="rounded-xl border border-slate-200 px-4 py-3 text-sm xl:col-span-2" />
+            <input type="password" value={createForm.password} onChange={event => setCreateForm(current => ({ ...current, password: event.target.value }))} placeholder="Senha" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+            <input type="password" value={createForm.confirmPassword} onChange={event => setCreateForm(current => ({ ...current, confirmPassword: event.target.value }))} placeholder="Confirmar senha" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+          </div>
+
+          <div className="mt-5 flex gap-3">
+            <Button onClick={handleCreateUser} disabled={isCreating}>
+              {isCreating ? 'Criando...' : 'Salvar usuario'}
+            </Button>
+            <Button variant="secondary" onClick={() => setIsCreateOpen(false)}>
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_1.25rem_3rem_rgba(15,23,42,0.05)]">
         <div className="border-b border-slate-200 px-4 pt-4 sm:px-6">

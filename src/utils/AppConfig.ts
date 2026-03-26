@@ -28,7 +28,7 @@ export const AppConfig = {
         },
         {
           label: 'Vendas',
-          href: '#',
+          href: '/vendas',
           roles: ['ADMIN', 'USER'] as UserRole[],
         },
       ],
